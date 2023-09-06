@@ -31,6 +31,7 @@ public class BookRepositoryImpl implements BookRepository {
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
+                throw new RuntimeException("Can't save a book: " + book, e);
             }
         } finally {
             if (entityManager != null) {
