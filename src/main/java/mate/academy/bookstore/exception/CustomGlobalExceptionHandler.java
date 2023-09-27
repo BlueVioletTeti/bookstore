@@ -1,4 +1,4 @@
-package mate.academy.bookstore.exceptions;
+package mate.academy.bookstore.exception;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
