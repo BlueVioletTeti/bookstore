@@ -1,7 +1,7 @@
 package com.vozniuk.bookstore.controller;
 
-import com.vozniuk.bookstore.dto.BookDto;
-import com.vozniuk.bookstore.dto.CreateBookRequestDto;
+import com.vozniuk.bookstore.dto.book.BookDto;
+import com.vozniuk.bookstore.dto.book.CreateBookRequestDto;
 import com.vozniuk.bookstore.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

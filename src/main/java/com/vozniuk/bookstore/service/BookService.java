@@ -1,7 +1,7 @@
 package com.vozniuk.bookstore.service;
 
-import com.vozniuk.bookstore.dto.BookDto;
-import com.vozniuk.bookstore.dto.CreateBookRequestDto;
+import com.vozniuk.bookstore.dto.book.BookDto;
+import com.vozniuk.bookstore.dto.book.CreateBookRequestDto;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 
