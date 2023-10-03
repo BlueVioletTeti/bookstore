@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = userMapper.toModel(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        Role role = roleRepository.getByName(Role.RoleName.USER);
+        Role role = roleRepository.getByName(Role.RoleName.ROLE_USER);
         user.setRoles(Set.of(role));
         return userMapper.toUserResponse(userRepository.save(user));
     }
