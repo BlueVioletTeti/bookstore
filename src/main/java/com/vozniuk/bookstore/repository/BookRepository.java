@@ -11,16 +11,16 @@ import org.springframework.data.repository.query.Param;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
     @Override
-    @Query("SELECT DISTINCT b FROM Book b "
+    @Query("SELECT  b FROM Book b "
             + "LEFT JOIN FETCH b.categories")
     Page<Book> findAll(Pageable pageable);
 
     @Override
-    @Query("SELECT DISTINCT b FROM Book b "
+    @Query("SELECT  b FROM Book b "
             + "LEFT JOIN FETCH b.categories WHERE b.id = :categoryId")
     Optional<Book> findById(@Param("categoryId") Long categoryId);
 
-    @Query("SELECT DISTINCT b FROM Book b "
+    @Query("SELECT b FROM Book b "
             + "LEFT JOIN FETCH b.categories c WHERE c.id = :categoryId")
     List<Book> findAllByCategoryId(@Param("categoryId") Long categoryId);
 }
