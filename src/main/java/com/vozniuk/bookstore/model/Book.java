@@ -46,4 +46,11 @@ public class Book {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<Category> categories = new HashSet<>();
+
+    public Book() {
+    }
+
+    public Book(Long id) {
+        this.id = id;
+    }
 }

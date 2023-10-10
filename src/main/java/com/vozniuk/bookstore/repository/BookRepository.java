@@ -1,7 +1,6 @@
 package com.vozniuk.bookstore.repository;
 
 import com.vozniuk.bookstore.model.Book;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,8 +18,4 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("SELECT  b FROM Book b "
             + "LEFT JOIN FETCH b.categories WHERE b.id = :categoryId")
     Optional<Book> findById(@Param("categoryId") Long categoryId);
-
-    @Query("SELECT b FROM Book b "
-            + "LEFT JOIN FETCH b.categories c WHERE c.id = :categoryId")
-    List<Book> findAllByCategoryId(@Param("categoryId") Long categoryId);
 }
