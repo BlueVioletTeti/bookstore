@@ -83,7 +83,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 );
         cartItem.setQuantity(requestDto.getQuantity());
         cartItemRepository.save(cartItem);
-        return shoppingCartMapper.toDto(cartItem.getShoppingCart());
+        return shoppingCartMapper.toDto(shoppingCart);
     }
 
     @Override
@@ -99,6 +99,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                                 .formatted(cartItemId, authenticationService.getUserId()))
                 );
         cartItemRepository.delete(cartItem);
-        return shoppingCartMapper.toDto(cartItem.getShoppingCart());
+        return shoppingCartMapper.toDto(shoppingCart);
     }
 }
