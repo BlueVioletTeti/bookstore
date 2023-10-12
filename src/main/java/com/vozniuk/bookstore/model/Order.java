@@ -18,6 +18,8 @@ import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -47,6 +49,7 @@ public class Order {
     @OneToMany(mappedBy = "order")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @Cascade(CascadeType.PERSIST)
     private Set<OrderItem> orderItems = new HashSet<>();
 
     public enum Status {

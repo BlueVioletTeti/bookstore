@@ -51,7 +51,6 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal total = BigDecimal.valueOf(0);
         for (CartItem item : cartItems) {
             OrderItem orderItem = new OrderItem();
-            orderItem.setId(item.getId());
             orderItem.setOrder(order);
             orderItem.setBook(item.getBook());
             orderItem.setPrice(item.getBook().getPrice());
