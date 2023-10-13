@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-statuses-table
+      author: tania
+      changes:
+        - insert:
+            tableName: statuses
+            columns:
+              - column: {name: name, value: "NEW"}
+        - insert:
+            tableName: statuses
+            columns:
+              - column: {name: name, value: "PROCESSING"}
+        - insert:
+            tableName: statuses
+            columns:
+              - column: {name: name, value: "SHIPPED"}
+        - insert:
+            tableName: statuses
+            columns:
+              - column: { name: name, value: "COMPLETED" }
+        - insert:
+            tableName: statuses
+            columns:
+              - column: { name: name, value: "CANCELLED" }
