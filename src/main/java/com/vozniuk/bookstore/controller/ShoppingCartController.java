@@ -1,5 +1,6 @@
 package com.vozniuk.bookstore.controller;
 
+import com.vozniuk.bookstore.dto.cart.CartItemDto;
 import com.vozniuk.bookstore.dto.cart.ShoppingCartRequestDto;
 import com.vozniuk.bookstore.dto.cart.ShoppingCartRequestDtoWithoutCartItemId;
 import com.vozniuk.bookstore.dto.cart.ShoppingCartResponseDto;
@@ -41,7 +42,7 @@ public class ShoppingCartController {
     @PutMapping("/cart-items/{cartItemId}")
     @Operation(summary = "Update quantity of an item",
             description = "Update quantity of a book in the shopping cart")
-    public ShoppingCartResponseDto updateItemQuantity(
+    public CartItemDto updateItemQuantity(
             @PathVariable Long cartItemId,
             @RequestBody @Valid ShoppingCartRequestDtoWithoutCartItemId requestDto) {
         return shoppingCartService.updateCartItem(cartItemId, requestDto);
