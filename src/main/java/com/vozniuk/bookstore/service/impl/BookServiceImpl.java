@@ -1,11 +1,15 @@
-package com.vozniuk.bookstore.service;
+package com.vozniuk.bookstore.service.impl;
 
-import com.vozniuk.bookstore.dto.BookDto;
-import com.vozniuk.bookstore.dto.CreateBookRequestDto;
+import com.vozniuk.bookstore.dto.book.BookDto;
+import com.vozniuk.bookstore.dto.book.CreateBookRequestDto;
 import com.vozniuk.bookstore.mapper.BookMapper;
 import com.vozniuk.bookstore.model.Book;
+import com.vozniuk.bookstore.model.Category;
 import com.vozniuk.bookstore.repository.BookRepository;
+import com.vozniuk.bookstore.repository.CategoryRepository;
+import com.vozniuk.bookstore.service.BookService;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.HashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -16,11 +20,15 @@ import org.springframework.stereotype.Service;
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public BookDto save(CreateBookRequestDto requestDto) {
         Book book = bookMapper.toModel(requestDto);
-        return bookMapper.toDto(bookRepository.save(book));
+        List<Category> categories = categoryRepository.findAllById(requestDto.getCategoryIds());
+        book.setCategories(new HashSet<>(categories));
+        Book savedBook = bookRepository.save(book);
+        return bookMapper.toDto(bookRepository.save(savedBook));
     }
 
     @Override
@@ -33,7 +41,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDto findById(Long id) {
         return bookMapper.toDto(bookRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Can't find a book with it: " + id)));
+                () -> new EntityNotFoundException("Can't find a book with id: " + id)));
     }
 
     @Override

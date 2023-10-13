@@ -1,4 +1,4 @@
-package com.vozniuk.bookstore.service;
+package com.vozniuk.bookstore.service.impl;
 
 import com.vozniuk.bookstore.dto.user.UserRegistrationRequest;
 import com.vozniuk.bookstore.dto.user.UserResponseDto;
@@ -8,6 +8,7 @@ import com.vozniuk.bookstore.model.Role;
 import com.vozniuk.bookstore.model.User;
 import com.vozniuk.bookstore.repository.RoleRepository;
 import com.vozniuk.bookstore.repository.UserRepository;
+import com.vozniuk.bookstore.service.UserService;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +29,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = userMapper.toModel(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        Role role = roleRepository.getByName(Role.RoleName.USER);
+        Role role = roleRepository.getByName(Role.RoleName.ROLE_USER);
         user.setRoles(Set.of(role));
         return userMapper.toUserResponse(userRepository.save(user));
     }
