@@ -6,12 +6,15 @@ via development of well-thought-out management system.
 Simultaneously, clients of the bookstore would enjoy online shopping 
 using easy navigation tools through the variety of books represented in the store.
 
+You could check the video presentation of this project here: [link](https://www.loom.com/)
+
 ## Technologies and tools used 
 
 During development of the project were used such technologies and tools as: 
 * Spring Boot, 
 * Spring Boot Security, 
 * Spring Data JPA, 
+* Liquibase,
 * Soft deleting,
 * GlobalExceptionHandler,
 * Data Validation,
@@ -19,6 +22,7 @@ During development of the project were used such technologies and tools as:
 * Swagger,
 * Docker, 
 * Spring Boot Testing,
+* Mockito,
 * Postman.
 
 ## Controller functionalities
@@ -106,3 +110,9 @@ Available to users with the role ADMIN.
 - work with application using REST API via the tool of your choice (ex. Postman).
 
 ## Challenges and space for improvement
+- extra functionality could be added, for instance, search for a book by its name 
+- test coverage could be improved by adding test cases for repository, service, and controller layers
+- the project needs to be deployed to the AWS
+
+## Contributions
+You are welcome to contribute to this project by commenting code at hands and sharing your ideas for improvement 
