@@ -29,7 +29,7 @@ public class ShoppingCartController {
     @Operation(summary = "Get user's shopping cart",
             description = "Get a shopping cart by user id")
     public ShoppingCartResponseDto getCart() {
-        return shoppingCartService.getCart();
+        return shoppingCartService.getCartDto();
     }
 
     @PostMapping
