@@ -107,18 +107,15 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public void clear() {
         ShoppingCart shoppingCart = getCart();
         Set<CartItem> cartItems = shoppingCart.getCartItems();
-        for (CartItem item : cartItems) {
-            cartItemRepository.delete(item);
-        }
+        cartItemRepository.deleteAll(cartItems);
     }
 
     private CartItem getCartItem(Long cartItemId, ShoppingCart shoppingCart) {
-        CartItem cartItem = cartItemRepository
+        return cartItemRepository
                 .findByIdAndShoppingCartId(cartItemId, shoppingCart.getId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Can't find cart item by id %s for user with id %s"
                                 .formatted(cartItemId, authenticationService.getUserId()))
                 );
-        return cartItem;
     }
 }

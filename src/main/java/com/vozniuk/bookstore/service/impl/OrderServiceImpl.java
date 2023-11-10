@@ -39,15 +39,15 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public OrderResponseDto save(OrderRequestDto requestDto) {
-        Order order = new Order();
-        order.setShippingAddress(requestDto.getShippingAddress());
         ShoppingCart shoppingCart = shoppingCartService.getCart();
-        getOrderFromShoppingCart(order, shoppingCart);
+        Order order = createOrder(shoppingCart);
+        order.setShippingAddress(requestDto.getShippingAddress());
         orderRepository.save(order);
         return orderMapper.toDto(order);
     }
 
-    private void getOrderFromShoppingCart(Order order, ShoppingCart shoppingCart) {
+    private Order createOrder(ShoppingCart shoppingCart) {
+        Order order = new Order();
         Set<CartItem> cartItems = shoppingCart.getCartItems();
         Set<OrderItem> orderItems = new HashSet<>();
         BigDecimal total = BigDecimal.valueOf(0);
@@ -67,6 +67,8 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(Order.Status.NEW);
 
         shoppingCartService.clear();
+
+        return order;
     }
 
     @Transactional(readOnly = true)
