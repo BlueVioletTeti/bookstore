@@ -13,10 +13,9 @@ import com.vozniuk.bookstore.model.OrderItem;
 import com.vozniuk.bookstore.model.ShoppingCart;
 import com.vozniuk.bookstore.repository.OrderItemRepository;
 import com.vozniuk.bookstore.repository.OrderRepository;
-import com.vozniuk.bookstore.repository.ShoppingCartRepository;
-import com.vozniuk.bookstore.repository.UserRepository;
-import com.vozniuk.bookstore.security.AuthenticationService;
 import com.vozniuk.bookstore.service.OrderService;
+import com.vozniuk.bookstore.service.ShoppingCartService;
+import com.vozniuk.bookstore.service.UserService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -25,27 +24,30 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final ShoppingCartRepository shoppingCartRepository;
-    private final AuthenticationService authenticationService;
+    private final ShoppingCartService shoppingCartService;
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
+    @Transactional
     @Override
     public OrderResponseDto save(OrderRequestDto requestDto) {
-        Order order = new Order();
+        ShoppingCart shoppingCart = shoppingCartService.getCart();
+        Order order = createOrder(shoppingCart);
         order.setShippingAddress(requestDto.getShippingAddress());
-        order.setOrderDate(LocalDateTime.now());
-        ShoppingCart shoppingCart = shoppingCartRepository
-                .findByUserId(authenticationService.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException("Can't find shopping cart to place "
-                        + "an order by user with id: " + authenticationService.getUserId()));
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
+    }
+
+    private Order createOrder(ShoppingCart shoppingCart) {
+        Order order = new Order();
         Set<CartItem> cartItems = shoppingCart.getCartItems();
         Set<OrderItem> orderItems = new HashSet<>();
         BigDecimal total = BigDecimal.valueOf(0);
@@ -58,16 +60,18 @@ public class OrderServiceImpl implements OrderService {
             orderItems.add(orderItem);
             total = total.add(item.getBook().getPrice());
         }
-        order.setUser(userRepository.findById(authenticationService.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException("Can't find user with id: "
-                + authenticationService.getUserId())));
+        order.setOrderDate(LocalDateTime.now());
+        order.setUser(userService.getCurrentUser());
         order.setOrderItems(orderItems);
         order.setTotal(total);
         order.setStatus(Order.Status.NEW);
-        orderRepository.save(order);
-        return orderMapper.toDto(order);
+
+        shoppingCartService.clear();
+
+        return order;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<OrderResponseDto> findAll(Pageable pageable) {
         return orderRepository.findAll(pageable).stream()
@@ -75,6 +79,7 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
     }
 
+    @Transactional
     @Override
     public OrderResponseDto updateOrderStatus(Long id, OrderUpdateRequestDto requestDto) {
         Order order = orderRepository.findById(id)
@@ -83,6 +88,7 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toDto(order);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<OrderItemDto> findAllOrderItems(Long orderId, Pageable pageable) {
         Order order = orderRepository.findById(orderId)
@@ -94,6 +100,7 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public OrderItemDto findOrderItemById(Long orderId, Long itemId) {
         OrderItem orderItem = orderItemRepository.findByOrderAndItemIds(orderId, itemId)
