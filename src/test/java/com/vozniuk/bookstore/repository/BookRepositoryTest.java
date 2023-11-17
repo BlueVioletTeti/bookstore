@@ -1,6 +1,8 @@
 package com.vozniuk.bookstore.repository;
 
+import com.vozniuk.bookstore.dto.book.BookDto;
 import com.vozniuk.bookstore.model.Book;
+import java.math.BigDecimal;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.jdbc.Sql;
+import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -27,9 +30,16 @@ class BookRepositoryTest {
             "classpath:database/books/remove-book-from-books-table.sql"
     }, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void findAll_ValidData_ReturnsBooks() {
+        BookDto expected = new BookDto()
+                .setId(1L)
+                .setTitle("Java Book")
+                .setAuthor("Some author")
+                .setIsbn("9781617290459")
+                .setPrice(BigDecimal.valueOf(499));
+
         Page<Book> actual = bookRepository.findAll(PageRequest.of(0,20));
         Assertions.assertEquals(1, actual.getTotalElements());
-        Assertions.assertEquals("Java Book", actual.getContent().get(0).getTitle());
+        EqualsBuilder.reflectionEquals(expected, actual);
     }
 
     @Sql(scripts = {

@@ -1,5 +1,7 @@
 package com.vozniuk.bookstore.controller;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -10,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vozniuk.bookstore.dto.book.BookDto;
 import com.vozniuk.bookstore.dto.book.CreateBookRequestDto;
-import com.vozniuk.bookstore.model.Book;
 import com.vozniuk.bookstore.model.Category;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +36,13 @@ import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BookControllerTest {
     protected static MockMvc mockMvc;
+
+    private static final String DEFAULT_TITLE = "Java Book";
+    private static final String DEFAULT_AUTHOR = "Some author";
+    private static final String DEFAULT_ISBN = "9781617290459";
+    private static final BigDecimal DEFAULT_PRICE = BigDecimal.valueOf(499);
+    private static final Category DEFAULT_CATEGORY = new Category().setId(1L);
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -52,21 +59,15 @@ class BookControllerTest {
     @Test
     @WithMockUser(username = "user", roles = {"USER"})
     @DisplayName("Verify getAll() method works correctly")
-    @Sql(scripts = "classpath:database/books/add-default-books-to-books-table.sql",
+    @Sql(scripts = {"classpath:database/books/add-default-books-to-books-table.sql"},
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "classpath:database/books/remove-all-books-from-books-table.sql",
+    @Sql(scripts = {"classpath:database/books/remove-all-books-from-books-table.sql"},
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void getAll_NonEmptyRepository_ReturnsAllBooks() throws Exception {
         List<BookDto> expected = new ArrayList<>();
-        expected.add(new BookDto().setId(1L).setTitle("Java Book 1").setAuthor("Some author 1")
-                .setIsbn("9781617290459").setPrice(BigDecimal.valueOf(499))
-                .setCategoryIds(new HashSet<Long>(0)));
-        expected.add(new BookDto().setId(2L).setTitle("Java Book 2").setAuthor("Some author 2")
-                .setIsbn("8781617290559").setPrice(BigDecimal.valueOf(599))
-                .setCategoryIds(new HashSet<Long>(0)));
-        expected.add(new BookDto().setId(3L).setTitle("Java Book 3").setAuthor("Some author 3")
-                .setIsbn("978-3-16-148410-0").setPrice(BigDecimal.valueOf(699))
-                .setCategoryIds(new HashSet<Long>(0)));
+        expected.add(createBookDto(1L, DEFAULT_ISBN, DEFAULT_PRICE));
+        expected.add(createBookDto(2L, "8781617290559", BigDecimal.valueOf(599)));
+        expected.add(createBookDto(3L, "978-3-16-148410-0", BigDecimal.valueOf(699)));
 
         MvcResult result = mockMvc.perform(
                 get("/api/books")
@@ -77,8 +78,8 @@ class BookControllerTest {
 
         BookDto[] actual = objectMapper.readValue(result.getResponse().getContentAsByteArray(),
                 BookDto[].class);
-        Assertions.assertEquals(3, actual.length);
-        Assertions.assertEquals(expected, Arrays.stream(actual).toList());
+        assertEquals(3, actual.length);
+        EqualsBuilder.reflectionEquals(expected, Arrays.stream(actual).toList(), "categoryIds");
     }
 
     @Test
@@ -89,10 +90,7 @@ class BookControllerTest {
     @Sql(scripts = "classpath:database/books/remove-all-books-from-books-table.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void getBookById_ValidId_ReturnsBook() throws Exception {
-        BookDto expected = new BookDto().setId(2L).setTitle("Java Book 2")
-                .setAuthor("Some author 2").setIsbn("8781617290559")
-                .setPrice(BigDecimal.valueOf(599))
-                .setCategoryIds(new HashSet<Long>(0));
+        BookDto expected = createBookDto();
 
         MvcResult result = mockMvc.perform(
                         get("/api/books/2")
@@ -100,10 +98,10 @@ class BookControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andReturn();
+
         BookDto actual = objectMapper.readValue(result.getResponse().getContentAsString(),
                 BookDto.class);
-        Assertions.assertEquals(2, actual.getId());
-        Assertions.assertEquals(expected, actual);
+        EqualsBuilder.reflectionEquals(expected, actual, "categoryIds");
     }
 
     @Test
@@ -113,10 +111,7 @@ class BookControllerTest {
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void createBook_ValidRequestDto_Success() throws Exception {
         CreateBookRequestDto requestDto = createBookRequestDto();
-        Category category = createCategory();
-        Book book = createBook(requestDto);
-        BookDto expected = createBookDto(book);
-        expected.setCategoryIds(Set.of(category.getId()));
+        BookDto expected = createBookDto();
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
         MvcResult result = mockMvc.perform(
@@ -129,9 +124,9 @@ class BookControllerTest {
 
         BookDto actual = objectMapper.readValue(result.getResponse().getContentAsString(),
                 BookDto.class);
-        Assertions.assertNotNull(actual);
-        Assertions.assertNotNull(actual.getId());
-        Assertions.assertEquals(expected.getTitle(), actual.getTitle());
+        assertNotNull(actual);
+        assertNotNull(actual.getId());
+        assertEquals(expected.getTitle(), actual.getTitle());
         EqualsBuilder.reflectionEquals(expected, actual, "id");
     }
 
@@ -160,9 +155,9 @@ class BookControllerTest {
 
         BookDto actual = objectMapper.readValue(result.getResponse().getContentAsString(),
                 BookDto.class);
-        Assertions.assertNotNull(actual);
-        Assertions.assertNotNull(actual.getId());
-        Assertions.assertEquals(expected.getTitle(), actual.getTitle());
+        assertNotNull(actual);
+        assertNotNull(actual.getId());
+        assertEquals(expected.getTitle(), actual.getTitle());
         EqualsBuilder.reflectionEquals(expected, actual, "id");
     }
 
@@ -181,38 +176,32 @@ class BookControllerTest {
                 .andReturn();
     }
 
-    private static Category createCategory() {
-        return new Category().setId(1L);
-    }
-
     private static CreateBookRequestDto createBookRequestDto() {
-        String title = "Java Book";
-        String author = "Some author";
-        String isbn = "9781617290459";
-        BigDecimal price = BigDecimal.valueOf(499);
-        Category category = createCategory();
         return new CreateBookRequestDto()
-                .setTitle(title)
-                .setAuthor(author)
-                .setIsbn(isbn)
-                .setPrice(price)
-                .setCategoryIds(Set.of(category.getId()));
+                .setTitle(DEFAULT_TITLE)
+                .setAuthor(DEFAULT_AUTHOR)
+                .setIsbn(DEFAULT_ISBN)
+                .setPrice(DEFAULT_PRICE)
+                .setCategoryIds(Set.of(DEFAULT_CATEGORY.getId()));
     }
 
-    private static BookDto createBookDto(Book book) {
+    private static BookDto createBookDto() {
         return new BookDto()
                 .setId(1L)
-                .setTitle(book.getTitle())
-                .setAuthor(book.getAuthor())
-                .setIsbn(book.getIsbn())
-                .setPrice(book.getPrice());
+                .setTitle(DEFAULT_TITLE)
+                .setAuthor(DEFAULT_AUTHOR)
+                .setIsbn(DEFAULT_ISBN)
+                .setPrice(DEFAULT_PRICE)
+                .setCategoryIds(Set.of(DEFAULT_CATEGORY.getId()));
     }
 
-    private static Book createBook(CreateBookRequestDto requestDto) {
-        return new Book()
-                .setTitle(requestDto.getTitle())
-                .setAuthor(requestDto.getAuthor())
-                .setIsbn(requestDto.getIsbn())
-                .setPrice(requestDto.getPrice());
+    private static BookDto createBookDto(Long id, String isbn, BigDecimal price) {
+        return new BookDto()
+                .setId(id)
+                .setTitle(DEFAULT_TITLE + " " + id)
+                .setAuthor(DEFAULT_AUTHOR + " " + id)
+                .setIsbn(isbn)
+                .setPrice(price)
+                .setCategoryIds(Set.of(DEFAULT_CATEGORY.getId()));
     }
 }

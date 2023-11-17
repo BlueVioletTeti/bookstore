@@ -30,6 +30,12 @@ import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class BookServiceImplTest {
+    private static final String DEFAULT_TITLE = "Java Book";
+    private static final String DEFAULT_AUTHOR = "Some author";
+    private static final String DEFAULT_ISBN = "9781617290459";
+    private static final BigDecimal DEFAULT_PRICE = BigDecimal.valueOf(499);
+    private static final Category DEFAULT_CATEGORY = new Category().setId(1L);
+
     @Mock
     private BookRepository bookRepository;
     @Mock
@@ -44,7 +50,7 @@ class BookServiceImplTest {
     @DisplayName("Verify save() method works")
     void save_ValidCreateBookRequestDto_ReturnsBookDto() {
         CreateBookRequestDto requestDto = createBookRequestDto();
-        Category category = createCategory();
+        Category category = DEFAULT_CATEGORY;
         Book book = createBook(requestDto);
         BookDto bookDto = createBookDto(book);
         bookDto.setCategoryIds(Set.of(category.getId()));
@@ -64,7 +70,7 @@ class BookServiceImplTest {
     @Test
     void findAll_RepositoryNotEmpty_ReturnsListOfBookDto() {
         CreateBookRequestDto requestDto = createBookRequestDto();
-        Category category = createCategory();
+        Category category = DEFAULT_CATEGORY;
         Book book = createBook(requestDto);
         Set<Category> categories = Set.of(category);
         book.setCategories(categories);
@@ -87,7 +93,7 @@ class BookServiceImplTest {
     @Test
     void findById_ValidId_ReturnsBookDto() {
         CreateBookRequestDto requestDto = createBookRequestDto();
-        Category category = createCategory();
+        Category category = DEFAULT_CATEGORY;
         Book book = createBook(requestDto);
         BookDto bookDto = createBookDto(book);
         bookDto.setCategoryIds(Set.of(category.getId()));
@@ -107,7 +113,7 @@ class BookServiceImplTest {
     @Test
     void update_ValidIdAndCreateBookRequestDto_ReturnsBookDto() {
         CreateBookRequestDto requestDto = createBookRequestDto();
-        Category category = createCategory();
+        Category category = DEFAULT_CATEGORY;
         Book book = createBook(requestDto);
         BookDto bookDto = createBookDto(book);
         bookDto.setCategoryIds(Set.of(category.getId()));
@@ -132,42 +138,28 @@ class BookServiceImplTest {
     }
 
     private static BookDto createBookDto(Book book) {
-        BookDto bookDto = new BookDto();
-        bookDto.setId(1L);
-        bookDto.setTitle(book.getTitle());
-        bookDto.setAuthor(book.getAuthor());
-        bookDto.setIsbn(book.getIsbn());
-        bookDto.setPrice(book.getPrice());
-        return bookDto;
-    }
-
-    private static Category createCategory() {
-        Category category = new Category();
-        category.setId(1L);
-        return category;
+        return new BookDto()
+                .setId(1L)
+                .setTitle(book.getTitle())
+                .setAuthor(book.getAuthor())
+                .setIsbn(book.getIsbn())
+                .setPrice(book.getPrice());
     }
 
     private static Book createBook(CreateBookRequestDto requestDto) {
-        Book book = new Book();
-        book.setTitle(requestDto.getTitle());
-        book.setAuthor(requestDto.getAuthor());
-        book.setIsbn(requestDto.getIsbn());
-        book.setPrice(requestDto.getPrice());
-        return book;
+        return new Book()
+                .setTitle(requestDto.getTitle())
+                .setAuthor(requestDto.getAuthor())
+                .setIsbn(requestDto.getIsbn())
+                .setPrice(requestDto.getPrice());
     }
 
     private static CreateBookRequestDto createBookRequestDto() {
-        CreateBookRequestDto requestDto = new CreateBookRequestDto();
-        String title = "Java Book";
-        requestDto.setTitle(title);
-        String author = "Some author";
-        requestDto.setAuthor(author);
-        String isbn = "9781617290459";
-        requestDto.setIsbn(isbn);
-        BigDecimal price = BigDecimal.valueOf(499);
-        requestDto.setPrice(price);
-        Category category = createCategory();
-        requestDto.setCategoryIds(Set.of(category.getId()));
-        return requestDto;
+        return new CreateBookRequestDto()
+                .setTitle(DEFAULT_TITLE)
+                .setAuthor(DEFAULT_AUTHOR)
+                .setIsbn(DEFAULT_ISBN)
+                .setPrice(DEFAULT_PRICE)
+                .setCategoryIds(Set.of(DEFAULT_CATEGORY.getId()));
     }
 }
