@@ -64,7 +64,8 @@ class ShoppingCartServiceImplTest {
     //        CartItem cartItem = getCartItem(book);
     //        ShoppingCart shoppingCart = getShoppingCart(cartItem, user);
     //        CartItemDto cartItemDto = getCartItemDto(book);
-    //        ShoppingCartResponseDto shoppingCartResponseDto = getShoppingCartResponseDto(cartItemDto);
+    //        ShoppingCartResponseDto shoppingCartResponseDto =
+    //        getShoppingCartResponseDto(cartItemDto);
     //
     //        when(shoppingCartRepository.findByUserId(any(Long.class)))
     //                .thenReturn(Optional.ofNullable(shoppingCart));
