@@ -6,8 +6,6 @@ via development of well-thought-out management system.
 Simultaneously, clients of the bookstore would enjoy online shopping 
 using easy navigation tools through the variety of books represented in the store.
 
-You could check the video presentation of this project here: [link](https://www.loom.com/)
-
 ## Technologies and tools used 
 
 During development of the project were used such technologies and tools as: 
